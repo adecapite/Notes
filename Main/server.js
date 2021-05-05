@@ -26,4 +26,22 @@ app.get("/api/notes", function(req, res) {
 
 });
 
-app.get("/api/notes")
+app.get("/api/notes:id", function(req, res) {
+  let savedNotes = json.parse(fs.readFileSync("./db/db.json", "utf8"));
+  res.json(savedNotes[Number(req.params.id)]);
+});
+
+app.get("*", function(req, res) {
+  res.sendFile(path.join(mainDir, "index.html"));
+});
+
+app.post('/api/notes', function(req, res) {
+  let savedNotes = json.parse(fs.readFileSync("./db/db.json", "utf8"));
+  let newNote = req.body;
+  let uniqueID = (savedNotes.length).tostring();
+  newNote.id = uniqueID;
+  savedNotes.push(newNote);
+  fs.writeFileSync('./db/db.json', json.stringify(savedNotes));
+  console.log("Saved. Content: ", newNote);
+  res.json(savedNotes);
+})
